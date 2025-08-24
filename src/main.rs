@@ -1,4 +1,4 @@
-use iced::{Element, widget::button};
+use iced::Element;
 
 use crate::{home::Home, ping::Ping};
 
@@ -20,8 +20,9 @@ impl Default for State {
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    Home(home::Action),
-    Ping(ping::Message),
+    // anything in parenthesis are just dragging up the Messages from the pages. why? look below lil bro
+    Home(home::Message),
+    Ping(ping::Message), // pings messages dragged up here
 }
 
 enum Screen {
@@ -35,13 +36,17 @@ fn main() -> iced::Result {
 }
 
 fn update(state: &mut State, message: Message) {
+    println!("Main method received message {:?}", message);
     match message {
-        Message::Home(message) => {
-            if let Screen::Home(home) = &mut state.screen {
-                // let action = home
+        Message::Home(_) => state.screen = Screen::Ping(Ping::new()), // this says if ANY home message, go to ping screen
+        Message::Ping(message) => {
+            // if we're on the ping screen, update ping, otherwise do nothing
+            if let Screen::Ping(ping) = &mut state.screen {
+                ping.update(message);
+                // if we need to do anything on the home screen, capture the result of
+                // ping.update(message) and run a switch statement on the result
             }
         }
-        Message::Ping(_) => state.screen = Screen::Ping(Ping::new()),
     }
 }
 
