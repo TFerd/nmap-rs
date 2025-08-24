@@ -1,52 +1,53 @@
-use std::net::{IpAddr, Ipv4Addr};
+use iced::{Element, widget::button};
 
-use iced::{
-    Element,
-    widget::{button, column, text},
-};
+use crate::{home::Home, ping::Ping};
 
-use crate::ping::Ping;
-
+mod home;
 mod navbar;
 mod ping;
 
 struct State {
-    page: Page,
-}
-enum Page {
-    Ping(Ping),
-    // Sniffer
+    screen: Screen,
 }
 
-fn main() -> iced::Result {
-    iced::run("hello world", update, view)
-}
-
-fn update(state: &mut State, message: Message) {
-    match message {
-        Message::Ping(ipAddr) => {
-            println!("cawk: {:?}", ipAddr);
-            // pagestate.ping_output = "ballsack".to_string()
-            state.page(g).ma
+impl Default for State {
+    fn default() -> Self {
+        Self {
+            screen: Screen::Home(Home::new()),
         }
     }
 }
 
-fn view(page: Page) -> Element<Message> {
-    match page {
-        // Page::Ping(ping) => column![
-        //     button(text("pres me"))
-        //         .on_press(Message::Ping(IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)))),
-        //     text(ping.state.ping_output.to_string())
-        // ]
-        // .spacing(5)
-        // .into(),
-        Page::Ping(ping) => ping.view(),
-        _ => text("where am i".to_string()),
+#[derive(Debug, Clone, Copy)]
+enum Message {
+    Home(home::Action),
+    Ping(ping::Message),
+}
+
+enum Screen {
+    Home(Home),
+    Ping(Ping),
+    // Sniffer,
+}
+
+fn main() -> iced::Result {
+    iced::application("hello world", update, view).run()
+}
+
+fn update(state: &mut State, message: Message) {
+    match message {
+        Message::Home(message) => {
+            if let Screen::Home(home) = &mut state.screen {
+                // let action = home
+            }
+        }
+        Message::Ping(_) => state.screen = Screen::Ping(Ping::new()),
     }
 }
 
-#[derive(Debug, Clone)]
-enum Message {
-    Ping(IpAddr),
+fn view(state: &State) -> Element<Message> {
+    match &state.screen {
+        Screen::Home(home) => home.view().map(Message::Home),
+        Screen::Ping(ping) => ping.view().map(Message::Ping),
+    }
 }

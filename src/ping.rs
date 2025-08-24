@@ -10,7 +10,7 @@ pub struct Ping {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum PingMessage {
+pub enum Message {
     Ping(IpAddr),
 }
 
@@ -20,17 +20,24 @@ pub enum PingMessage {
 // }
 
 impl Ping {
-    pub fn view(&self) -> Element<PingMessage> {
+    pub fn new() -> Self {
+        Self {
+            ping_output: "".to_string(),
+        }
+    }
+
+    pub fn view(&self) -> Element<Message> {
         column![
-            button("cokc").on_press(PingMessage::Ping(IpAddr::V4(Ipv4Addr::new(1, 1, 1, 1)))),
+            button("cokc").on_press(Message::Ping(IpAddr::V4(Ipv4Addr::new(1, 1, 1, 1)))),
             text(self.ping_output.to_string())
         ]
         .into()
     }
 
-    pub fn update(&mut self, message: PingMessage) {
+    pub fn update(&mut self, message: Message) {
         match message {
-            PingMessage::Ping(ip_addr) => {
+            Message::Ping(ip_addr) => {
+                self.ping_output = ip_addr.to_string();
                 println!("todo: do this shit {:?}", ip_addr)
             }
         }
